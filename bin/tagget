@@ -16,6 +16,11 @@ rm $TEMPDIR
 mkdir $TEMPDIR
 OLDDIR=$PWD
 
+# if the label directory already exists, copy any images in it to the TEMPDIR
+TAGDIR="$(echo ${TAGS} | sed 's/ /-/g;s|/||g;s|\\||g;')"
+mkdir -pv "$TEMPDIR/$TAGDIR"
+cp -Rvf $LABEL/* "$TEMPDIR/$TAGDIR"
+
 # grab the list of tags
 danbooru-grabber -e gelbooru -i xml -dfn post:id-post:md5-post:tags -dm export -d $TAGS > $LABEL/tags
 
