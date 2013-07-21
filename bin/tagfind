@@ -1,0 +1,46 @@
+#!/bin/bash
+DIR=$1
+shift
+TAGS=$*
+if [ "$TAGS" ]; then
+	TAGSEARCH="$(
+		P=
+		for tag in $TAGS; do
+			echo -n "$P" egrep -- \"\(-\|^\)$tag\(-\|$\)\"
+			P=\ \|
+		done
+	)"
+	
+	RESULTS=$(tempfile)
+	cat $DIR/tags \
+		| cut -f 4 -d ' ' \
+		| grep -o '^[0-9]*-[0-9a-f]*--.*' \
+		| bash -c "$TAGSEARCH" \
+		| grep -o '^[0-9]*-[0-9a-f]*' \
+		> $RESULTS
+	if [ $? -ne 0 ]; then
+		echo "Not found: ($TAGS)" 1>&2
+		exit 1
+	fi
+	
+	find $DIR -type f \( \
+		-iname '*jpg' -or \
+		-iname '*jpeg' -or \
+		-iname '*png' -or \
+		-iname '*gif' \) \( \
+		$(
+			OR=
+			while read line; do
+				echo -n \ $OR -iname \*$line\*
+				OR=-or
+			done < $RESULTS
+		) \) -exec eog {} +
+else
+	cat $DIR/tags \
+		| cut -f 3- -d - \
+		| sed 's/\..*$//g' \
+		| grep -P -o '(^|-).*?(-|$)' \
+		| sed 's/^-//g' \
+		| sed 's/-$//g' \
+		| sort -u
+fi

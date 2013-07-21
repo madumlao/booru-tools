@@ -1,0 +1,29 @@
+#!/bin/bash
+LABEL=$1
+shift
+TAGS=$*
+
+if ! [ "$TAGS" ]; then
+	TAGS="$LABEL"
+fi
+
+# create the parent directory
+mkdir -pv $LABEL
+
+# create the working directory
+TEMPDIR=$(tempfile)
+rm $TEMPDIR
+mkdir $TEMPDIR
+OLDDIR=$PWD
+
+# grab the list of tags
+danbooru-grabber -e gelbooru -i xml -dfn post:id-post:md5-post:tags -dm export -d $TAGS > $LABEL/tags
+
+# grab the list of images
+cd $TEMPDIR
+danbooru-grabber -e gelbooru -i xml -dfn post:id-post:md5 -dm onedir -d $TAGS
+
+# move the list of images to the label dir
+cd $OLDDIR
+find $TEMPDIR -type f -exec mv -v {} $LABEL \;
+rmdir -v $TEMPDIR
