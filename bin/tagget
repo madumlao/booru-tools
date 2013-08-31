@@ -1,4 +1,16 @@
 #!/bin/bash
+# downloads a list of gelbooru tags into a directory
+
+tagget_help () {
+	echo "$(basename $0) LABEL [TAG] [TAG] ..."
+	echo "  downloads the pictures from a list of tags from gelbooru into a directory"
+}
+
+if [ "$#" -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
+	tagget_help
+	exit
+fi
+
 LABEL=$1
 shift
 TAGS=$*

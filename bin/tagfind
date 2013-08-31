@@ -1,4 +1,16 @@
 #!/bin/bash
+# opens a viewer showing all pictures containing the specified tag in a directory
+
+tagfind_help () {
+	echo "$(basename $0) LABEL [TAG] [TAG] ..."
+	echo "  opens a viewer showing all pictures containing the specified tag in a directory"
+}
+
+if [ "$#" -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
+	tagfind_help
+	exit
+fi
+
 DIR=$1
 shift
 TAGS=$*
